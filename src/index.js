@@ -6,6 +6,7 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
         const origin = request.headers.get('Origin');
+        console.log(`Received request from origin: ${origin}`);
 
         // Handle CORS preflight requests
         if (request.method === 'OPTIONS') {
@@ -16,23 +17,26 @@ export default {
             return new Response(null, { headers: responseHeaders, status: 204 });
         }
 
-        if (request.method === 'POST' && url.pathname === '/api/contact') {
+        if (request.method === 'POST' && url.pathname === '') {
             if (!allowedOrigins.includes(origin)) {
+                console.warn(`Origin not allowed: ${origin}`);
                 return new Response('Origin not allowed', { status: 403 });
             }
 
             try {
                 const { name, email, company, message } = await request.json();
+                console.log(`Received data: ${JSON.stringify({ name, email, company, message })}`);
 
                 if (!name || !email || !company || !message) {
+                    console.error('Missing required fields');
                     return new Response('Missing required fields', { status: 400 });
                 }
 
                 const emailContent = `
-                  Name: ${name}
-                  Email: ${email}
-                  Company: ${company}
-                  Message: ${message}
+                    Name: ${name}
+                    Email: ${email}
+                    Company: ${company}
+                    Message: ${message}
                 `;
 
                 const rawEmail = `
@@ -43,6 +47,8 @@ Subject: New Contact Form Submission from ${name}
 ${emailContent}
                 `;
 
+                console.log(`Constructed email content: ${emailContent}`);
+
                 const emailMessage = new EmailMessage(
                     email,
                     env.SEB.destination_address || '${DESTINATION_EMAIL}',
@@ -50,12 +56,14 @@ ${emailContent}
                 );
 
                 await env.SEB.send(emailMessage);
+                console.log('Email sent successfully');
 
                 const responseHeaders = new Headers();
                 responseHeaders.set('Access-Control-Allow-Origin', origin);
 
                 return new Response('Form submission successful', { headers: responseHeaders, status: 200 });
             } catch (error) {
+                console.error(`Error: ${error.message}`);
                 return new Response(`Error: ${error.message}`, { status: 500 });
             }
         }
