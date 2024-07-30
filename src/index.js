@@ -34,39 +34,35 @@ export default {
                     return new Response('Missing required fields', { status: 400 });
                 }
 
-                const emailContent = `
-Name: ${name}
-Email: ${email}
-Company: ${company}
-Message: ${message}
-                `;
+                const emailContent = `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nMessage: ${message}`;
 
-                // Create MIME message
+                // Create MIME message using mimetext
+                const msg = createMimeMessage();
+                msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
+                msg.setRecipient(env.SEB.destination_address);
+                msg.setSubject(`New Contact Form Submission from ${name}`);
+                msg.addMessage({
+                    contentType: 'text/plain',
+                    data: emailContent
+                });
+                msg.setHeader("Reply-To", email);
+
+                const rawEmail = msg.asRaw();
+
+                console.log(`Constructed email content: ${rawEmail}`);
+
+                const emailMessage = new EmailMessage(
+                    env.FROM_EMAIL,
+                    env.SEB.destination_address,
+                    rawEmail
+                );
+
                 try {
-                    const msg = createMimeMessage();
-                    msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
-                    msg.setRecipient(env.SEB.destination_address);
-                    msg.setSubject(`New Contact Form Submission from ${name}`);
-                    msg.addMessage({
-                        contentType: 'text/plain',
-                        data: emailContent
-                    });
-                    msg.setHeader("Reply-To", email);
-
-                    const rawEmail = msg.asRaw();
-                    console.log(`Constructed email content: ${rawEmail}`);
-
-                    const emailMessage = new EmailMessage(
-                        env.FROM_EMAIL,
-                        env.SEB.destination_address,
-                        rawEmail
-                    );
-
                     await env.SEB.send(emailMessage);
                     console.log('Email sent successfully');
-                } catch (mimeError) {
-                    console.error(`MIME error: ${mimeError.message}`);
-                    return new Response(`MIME error: ${mimeError.message}`, { status: 500 });
+                } catch (sendError) {
+                    console.error(`Sending error: ${sendError.message}`);
+                    return new Response(`Sending error: ${sendError.message}`, { status: 500 });
                 }
 
                 const responseHeaders = new Headers();
