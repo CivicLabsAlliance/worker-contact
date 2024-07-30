@@ -42,28 +42,32 @@ Message: ${message}
                 `;
 
                 // Create MIME message
-                const msg = createMimeMessage();
-                msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
-                msg.setRecipient(env.SEB.destination_address);
-                msg.setSubject(`New Contact Form Submission from ${name}`);
-                msg.addMessage({
-                    contentType: 'text/plain',
-                    data: emailContent
-                });
-                msg.setHeader("Reply-To", email);
+                try {
+                    const msg = createMimeMessage();
+                    msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
+                    msg.setRecipient(env.SEB.destination_address);
+                    msg.setSubject(`New Contact Form Submission from ${name}`);
+                    msg.addMessage({
+                        contentType: 'text/plain',
+                        data: emailContent
+                    });
+                    msg.setHeader("Reply-To", email);
 
-                const rawEmail = msg.asRaw();
+                    const rawEmail = msg.asRaw();
+                    console.log(`Constructed email content: ${rawEmail}`);
 
-                console.log(`Constructed email content: ${rawEmail}`);
+                    const emailMessage = new EmailMessage(
+                        env.FROM_EMAIL,
+                        env.SEB.destination_address,
+                        rawEmail
+                    );
 
-                const emailMessage = new EmailMessage(
-                    env.FROM_EMAIL,  // Use the FROM_EMAIL from environment variables
-                    env.SEB.destination_address,  // Set the destination address
-                    rawEmail  // Set the raw email content
-                );
-
-                await env.SEB.send(emailMessage);
-                console.log('Email sent successfully');
+                    await env.SEB.send(emailMessage);
+                    console.log('Email sent successfully');
+                } catch (mimeError) {
+                    console.error(`MIME error: ${mimeError.message}`);
+                    return new Response(`MIME error: ${mimeError.message}`, { status: 500 });
+                }
 
                 const responseHeaders = new Headers();
                 responseHeaders.set('Access-Control-Allow-Origin', origin);
