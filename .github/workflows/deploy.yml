@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy
+    name: Deploy ☁️👷
     steps:
       - uses: actions/checkout@v4
       - name: Install Wrangler
@@ -20,6 +20,7 @@ jobs:
           sed -i 's/${CLOUDFLARE_ACCOUNT_ID}/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/g' wrangler.toml
           sed -i 's/${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' wrangler.toml
           sed -i 's/${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' src/index.js
+          sed -i 's/${FROM_EMAIL}/${{ secrets.FROM_EMAIL }}/g' src/index.js
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3

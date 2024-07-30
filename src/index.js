@@ -40,8 +40,9 @@ export default {
                 `;
 
                 const rawEmail = `
-From: ${email}
-To: ${env.SEB.destination_address || '${DESTINATION_EMAIL}'}
+From: ${FROM_EMAIL}
+To: ${env.SEB.destination_address}
+Reply-To: ${email}
 Subject: New Contact Form Submission from ${name}
 
 ${emailContent}
@@ -50,9 +51,9 @@ ${emailContent}
                 console.log(`Constructed email content: ${emailContent}`);
 
                 const emailMessage = new EmailMessage(
-                    email,
-                    env.SEB.destination_address || '${DESTINATION_EMAIL}',
-                    rawEmail
+                    FROM_EMAIL,  // Use the FROM_EMAIL for the sender's address
+                    env.SEB.destination_address,  // Set the destination address
+                    rawEmail  // Set the raw email content
                 );
 
                 await env.SEB.send(emailMessage);
