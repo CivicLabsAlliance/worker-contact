@@ -1,5 +1,6 @@
 import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext';
+import { EOL } from 'node:os';
 
 const allowedOrigins = ['https://civiclabs.us', 'https://civic-labs.ai', 'http://localhost:51287'];
 
