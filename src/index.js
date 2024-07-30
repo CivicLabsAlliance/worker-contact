@@ -17,7 +17,7 @@ export default {
             return new Response(null, { headers: responseHeaders, status: 204 });
         }
 
-        if (request.method === 'POST' && url.pathname === '') {
+        if (request.method === 'POST' && url.pathname === '/api/contact') {
             if (!allowedOrigins.includes(origin)) {
                 console.warn(`Origin not allowed: ${origin}`);
                 return new Response('Origin not allowed', { status: 403 });
