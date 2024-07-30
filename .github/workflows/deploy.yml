@@ -1,0 +1,27 @@
+# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Manage Secrets
+        run: |
+          sed -i 's/${CLOUDFLARE_ACCOUNT_ID}/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/g' wrangler.toml
+          sed -i 's/${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' wrangler.toml
+          sed -i 's/${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' src/index.js
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

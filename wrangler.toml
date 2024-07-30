@@ -1,0 +1,18 @@
+# wrangler.toml
+
+name = "contact-forms"
+workers_dev = true
+compatibility_date = "2024-07-24"
+main = "src/index.js"
+
+account_id = "${CLOUDFLARE_ACCOUNT_ID}"
+
+# Route patterns to match both domains
+routes = [
+  {pattern = "*.civiclabs.us/api/contact", zone_name = "civiclabs.us"}
+]
+
+# Email binding
+send_email = [
+  {type = "send_email", name = "SEB", destination_address = "${DESTINATION_EMAIL}"}
+]
