@@ -12,8 +12,9 @@ jobs:
     name: Deploy ☁️👷
     steps:
       - uses: actions/checkout@v4
-      - name: Install Wrangler
-        run: npm install -g wrangler
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Manage Secrets
         run: |

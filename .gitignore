@@ -2,3 +2,5 @@
 .env
 .DS_Store
 .nova
+node_modules/*
+.wrangler/*

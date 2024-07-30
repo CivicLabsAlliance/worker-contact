@@ -1,4 +1,5 @@
 import { EmailMessage } from 'cloudflare:email';
+import { createMimeMessage } from 'mimetext';
 
 const allowedOrigins = ['https://civiclabs.us', 'https://civic-labs.ai', 'http://localhost:51287'];
 
@@ -37,24 +38,28 @@ Name: ${name}
 Email: ${email}
 Company: ${company}
 Message: ${message}
-        `;
+                `;
 
-                const rawEmail = `
-From: ${env.FROM_EMAIL}
-To: ${env.SEB.destination_address}
-Reply-To: ${email}
-Subject: New Contact Form Submission from ${name}
-
-${emailContent}
-        `;
-
-                console.log(`Constructed email content: ${emailContent}`);
-
-                const emailMessage = new EmailMessage({
-                    from: env.FROM_EMAIL, // Use the FROM_EMAIL from env variables
-                    to: env.SEB.destination_address, // Set the destination address
-                    raw: rawEmail // Set the raw email content
+                // Create MIME message
+                const msg = createMimeMessage();
+                msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
+                msg.setRecipient(env.SEB.destination_address);
+                msg.setSubject(`New Contact Form Submission from ${name}`);
+                msg.addMessage({
+                    contentType: 'text/plain',
+                    data: emailContent
                 });
+                msg.setHeader("Reply-To", email);
+
+                const rawEmail = msg.asRaw();
+
+                console.log(`Constructed email content: ${rawEmail}`);
+
+                const emailMessage = new EmailMessage(
+                    env.FROM_EMAIL,  // Use the FROM_EMAIL from environment variables
+                    env.SEB.destination_address,  // Set the destination address
+                    rawEmail  // Set the raw email content
+                );
 
                 await env.SEB.send(emailMessage);
                 console.log('Email sent successfully');
