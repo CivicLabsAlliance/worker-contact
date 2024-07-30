@@ -16,3 +16,6 @@ routes = [
 send_email = [
   {type = "send_email", name = "SEB", destination_address = "${DESTINATION_EMAIL}"}
 ]
+
+# Vars
+vars = { FROM_EMAIL = "${FROM_EMAIL}" }
