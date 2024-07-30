@@ -51,7 +51,7 @@ ${emailContent}
                 console.log(`Constructed email content: ${emailContent}`);
 
                 const emailMessage = new EmailMessage(
-                    ${FROM_EMAIL},  // Use the FROM_EMAIL for the sender's address
+                    ${FROM_EMAIL},  // set sender's address
                     env.SEB.destination_address,  // Set the destination address
                     rawEmail  // Set the raw email content
                 );
