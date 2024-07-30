@@ -1,5 +1,4 @@
 import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext';
 
 const allowedOrigins = ['https://civiclabs.us', 'https://civic-labs.ai'];
 
@@ -29,28 +28,25 @@ export default {
                     return new Response('Missing required fields', { status: 400 });
                 }
 
-                const msg = createMimeMessage();
-                msg.setSender({ name: name, addr: email });
-                msg.setRecipient(env.SEB.destination_address || '${DESTINATION_EMAIL}');
-                msg.setSubject(`New Contact Form Submission from ${name}`);
-
                 const emailContent = `
+                  Name: ${name}
+                  Email: ${email}
+                  Company: ${company}
+                  Message: ${message}
+                `;
 
-          Name: ${name}
-          Email: ${email}
-          Company: ${company}
-          Message: ${message}
-        `;
+                const rawEmail = `
+From: ${email}
+To: ${env.SEB.destination_address || '${DESTINATION_EMAIL}'}
+Subject: New Contact Form Submission from ${name}
 
-                msg.addMessage({
-                    contentType: 'text/plain',
-                    data: emailContent,
-                });
+${emailContent}
+                `;
 
                 const emailMessage = new EmailMessage(
                     email,
                     env.SEB.destination_address || '${DESTINATION_EMAIL}',
-                    msg.asRaw()
+                    rawEmail
                 );
 
                 await env.SEB.send(emailMessage);
