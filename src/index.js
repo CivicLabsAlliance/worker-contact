@@ -1,6 +1,6 @@
 import { EmailMessage } from 'cloudflare:email';
 
-const allowedOrigins = ['https://civiclabs.us', 'https://civic-labs.ai'];
+const allowedOrigins = ['https://civiclabs.us', 'https://civic-labs.ai', 'http://localhost:51287'];
 
 export default {
     async fetch(request, env) {
