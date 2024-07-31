@@ -13,6 +13,10 @@ export default {
         const origin = request.headers.get("Origin");
         console.log(`Received request from origin: ${origin}`);
 
+        // Log environment variables for debugging
+        console.log(`FROM_EMAIL: ${env.FROM_EMAIL}`);
+        console.log(`SEB destination_address: ${env.SEB.destination_address}`);
+
         // Handle CORS preflight requests
         if (request.method === "OPTIONS") {
             console.log("Handling CORS preflight request");
@@ -72,13 +76,20 @@ export default {
                 // Create MIME message using mimetext
                 console.log("Creating MIME message");
                 const msg = createMimeMessage();
-                msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
-                msg.setRecipient(env.SEB.destination_address);
-                msg.setSubject(`Contact Form Submission from ${name}`);
-                msg.addMessage({
-                    contentType: "text/plain",
-                    data: messageContent,
-                });
+                try {
+                    msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
+                    msg.setRecipient(env.SEB.destination_address);
+                    msg.setSubject(`Contact Form Submission from ${name}`);
+                    msg.addMessage({
+                        contentType: "text/plain",
+                        data: messageContent,
+                    });
+                } catch (mimeError) {
+                    console.error(`MIME error: ${mimeError.message}`);
+                    return new Response(`MIME error: ${mimeError.message}`, {
+                        status: 500,
+                    });
+                }
 
                 const rawEmail = msg.asRaw();
                 console.log("Constructed raw email:", rawEmail);
