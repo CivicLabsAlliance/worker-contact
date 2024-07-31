@@ -19,7 +19,6 @@ send_email = [
 ]
 
 # Vars
-vars = {
-  FROM_EMAIL = "${FROM_EMAIL}",
+[vars]
+  FROM_EMAIL = "${FROM_EMAIL}"
   DESTINATION_EMAIL = "${DESTINATION_EMAIL}"
-}
