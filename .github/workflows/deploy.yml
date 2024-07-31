@@ -20,12 +20,13 @@ jobs:
           sed -i "s/\${CLOUDFLARE_ACCOUNT_ID}/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/g" wrangler.toml
           sed -i "s/\${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g" wrangler.toml
           sed -i "s/\${FROM_EMAIL}/${{ secrets.FROM_EMAIL }}/g" wrangler.toml
-          sed -i "s/\${SLACK_WEBHOOK}/${{ secrets.SLACK_WEBHOOK }}/g" wrangler.toml
           sed -i "s/\${DESTINATION_CA_EMAIL}/${{ secrets.DESTINATION_CA_EMAIL }}/g" wrangler.toml
           sed -i "s/\${DESTINATION_HL_EMAIL}/${{ secrets.DESTINATION_HL_EMAIL }}/g" wrangler.toml
 
-      - name: Debug Wrangler.toml
-        run: cat wrangler.toml
+      - name: Handle Slack Webhook
+        run: |
+          SLACK_WEBHOOK_URI=$(echo '${{ secrets.SLACK_WEBHOOK }}' | sed 's/[\/&]/\\&/g')
+          sed -i "s#\${SLACK_WEBHOOK}#${SLACK_WEBHOOK_URI}#g" wrangler.toml
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
