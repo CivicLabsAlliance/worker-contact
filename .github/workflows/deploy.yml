@@ -20,6 +20,9 @@ jobs:
           sed -i 's/\${CLOUDFLARE_ACCOUNT_ID}/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/g' wrangler.toml
           sed -i 's/\${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' wrangler.toml
           sed -i 's/\${FROM_EMAIL}/${{ secrets.FROM_EMAIL }}/g' wrangler.toml
+          sed -i 's/\${SLACK_WEBHOOK}/${{ secrets.SLACK_WEBHOOK }}/g' wrangler.toml
+          sed -i 's/\${DESTINATION_CA_EMAIL}/${{ secrets.DESTINATION_CA_EMAIL }}/g' wrangler.toml
+          sed -i 's/\${DESTINATION_HL_EMAIL}/${{ secrets.DESTINATION_HL_EMAIL }}/g' wrangler.toml
 
       - name: Debug Wrangler.toml
         run: cat wrangler.toml # Add this line to check the wrangler.toml file
