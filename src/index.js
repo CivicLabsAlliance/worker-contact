@@ -16,6 +16,9 @@ export default {
         // Log environment variables for debugging
         console.log(`FROM_EMAIL: ${env.FROM_EMAIL}`);
         console.log(`DESTINATION_EMAIL: ${env.DESTINATION_EMAIL}`);
+        console.log(`DESTINATION_CA_EMAIL: ${env.DESTINATION_CA_EMAIL}`);
+        console.log(`DESTINATION_HL_EMAIL: ${env.DESTINATION_HL_EMAIL}`);
+        console.log(`SLACK_WEBHOOK: ${env.SLACK_WEBHOOK}`);
 
         // Handle CORS preflight requests
         if (request.method === "OPTIONS") {
@@ -68,14 +71,19 @@ export default {
 
                 // Capture additional Cloudflare geographical information
                 const ip = request.headers.get("cf-connecting-ip");
-                const country = request.cf ? request.cf.country : "Unknown";
-                const region = request.cf ? request.cf.region : "Unknown";
-                const city = request.cf ? request.cf.city : "Unknown";
-                const timezone = request.cf ? request.cf.timezone : "Unknown";
+                const country = request.cf
+                    ? request.cf.country || "N/A"
+                    : "N/A";
+                const region = request.cf ? request.cf.region || "N/A" : "N/A";
+                const city = request.cf ? request.cf.city || "N/A" : "N/A";
+                const timezone = request.cf
+                    ? request.cf.timezone || "N/A"
+                    : "N/A";
 
                 // Create message content
                 console.log("Constructing message content");
-                const messageContent = `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nMessage: ${message}\nIP Address: ${ip}\nCountry: ${country}\nRegion: ${region}\nCity: ${city}\nTimezone: ${timezone}`;
+                const messageContent = `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nMessage: ${message}\n
+                    IP Address: ${ip}\nCountry: ${country}\nRegion: ${region}\nCity: ${city}\nTimezone: ${timezone}`;
 
                 // Log message content for readability
                 console.log(`Message Content: ${messageContent}`);
@@ -85,7 +93,11 @@ export default {
                 const msg = createMimeMessage();
                 try {
                     msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
-                    msg.setRecipient(env.DESTINATION_EMAIL);
+                    msg.setRecipients([
+                        env.DESTINATION_EMAIL,
+                        env.DESTINATION_CA_EMAIL,
+                        env.DESTINATION_HL_EMAIL,
+                    ]);
                     msg.setSubject(`Contact Form Submission from ${name}`);
                     msg.addMessage({
                         contentType: "text/plain",
@@ -111,6 +123,37 @@ export default {
                 console.log("Attempting to send email");
                 await env.SEB.send(emailMessage);
                 console.log("Email sent successfully");
+
+                // Prepare Slack webhook payload
+                const slackPayload = {
+                    name: name || "N/A",
+                    email: email || "N/A",
+                    company: company || "N/A",
+                    message: message || "N/A",
+                    country: country || "N/A",
+                    city: city || "N/A",
+                    timezone: timezone || "N/A",
+                    region: region || "N/A",
+                };
+
+                console.log(
+                    `Sending Slack webhook: ${JSON.stringify(slackPayload)}`
+                );
+
+                // Send Slack webhook payload
+                const slackResponse = await fetch(env.SLACK_WEBHOOK, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(slackPayload),
+                });
+
+                if (!slackResponse.ok) {
+                    console.error(
+                        `Failed to send Slack webhook: ${slackResponse.statusText}`
+                    );
+                } else {
+                    console.log("Slack webhook sent successfully");
+                }
 
                 const responseHeaders = new Headers();
                 responseHeaders.set("Access-Control-Allow-Origin", origin);

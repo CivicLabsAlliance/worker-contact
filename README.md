@@ -7,3 +7,4 @@ This catches contact form submissions and forwards them to a special email.
 
 ## Useful Docs
 [Sending Email w/ Cloudflare Worker](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/)
+[Email Workers](https://developers.cloudflare.com/email-routing/email-workers/)
