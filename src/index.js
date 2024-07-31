@@ -66,9 +66,16 @@ export default {
                     });
                 }
 
+                // Capture additional Cloudflare geographical information
+                const ip = request.headers.get("cf-connecting-ip");
+                const country = request.cf ? request.cf.country : "Unknown";
+                const region = request.cf ? request.cf.region : "Unknown";
+                const city = request.cf ? request.cf.city : "Unknown";
+                const timezone = request.cf ? request.cf.timezone : "Unknown";
+
                 // Create message content
                 console.log("Constructing message content");
-                const messageContent = `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nMessage: ${message}`;
+                const messageContent = `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nMessage: ${message}\nIP Address: ${ip}\nCountry: ${country}\nRegion: ${region}\nCity: ${city}\nTimezone: ${timezone}`;
 
                 // Log message content for readability
                 console.log(`Message Content: ${messageContent}`);
