@@ -15,7 +15,7 @@ export default {
 
         // Log environment variables for debugging
         console.log(`FROM_EMAIL: ${env.FROM_EMAIL}`);
-        console.log(`SEB destination_address: ${env.SEB.destination_address}`);
+        console.log(`DESTINATION_EMAIL: ${env.DESTINATION_EMAIL}`);
 
         // Handle CORS preflight requests
         if (request.method === "OPTIONS") {
@@ -78,7 +78,7 @@ export default {
                 const msg = createMimeMessage();
                 try {
                     msg.setSender({ name: "CivicLabs", addr: env.FROM_EMAIL });
-                    msg.setRecipient(env.SEB.destination_address);
+                    msg.setRecipient(env.DESTINATION_EMAIL);
                     msg.setSubject(`Contact Form Submission from ${name}`);
                     msg.addMessage({
                         contentType: "text/plain",
@@ -96,7 +96,7 @@ export default {
 
                 const emailMessage = new EmailMessage(
                     env.FROM_EMAIL,
-                    env.SEB.destination_address,
+                    env.DESTINATION_EMAIL,
                     rawEmail
                 );
                 console.log("Email message object created");

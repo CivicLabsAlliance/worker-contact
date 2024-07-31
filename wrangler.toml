@@ -15,8 +15,11 @@ routes = [
 
 # Email binding
 send_email = [
-  { type = "send_email", name = "SEB", destination_address = "${DESTINATION_EMAIL}" }
+  { type = "send_email", name = "SEB" }
 ]
 
 # Vars
-vars = { FROM_EMAIL = "${FROM_EMAIL}" }
+vars = {
+  FROM_EMAIL = "${FROM_EMAIL}",
+  DESTINATION_EMAIL = "${DESTINATION_EMAIL}"
+}
