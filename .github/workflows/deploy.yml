@@ -24,6 +24,9 @@ jobs:
           sed -i "s/\${DESTINATION_CA_EMAIL}/${{ secrets.DESTINATION_CA_EMAIL }}/g" wrangler.toml
           sed -i "s/\${DESTINATION_HL_EMAIL}/${{ secrets.DESTINATION_HL_EMAIL }}/g" wrangler.toml
 
+      - name: Debug Wrangler.toml
+        run: cat wrangler.toml
+
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
