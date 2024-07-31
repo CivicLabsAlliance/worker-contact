@@ -4,7 +4,6 @@ import { createMimeMessage } from "mimetext";
 const allowedOrigins = [
     "https://civiclabs.us",
     "https://civic-labs.ai",
-    "http://localhost:51287",
 ];
 
 export default {
