@@ -10,14 +10,13 @@ account_id = "${CLOUDFLARE_ACCOUNT_ID}"
 
 # Routing
 routes = [
-  {pattern = "*.civiclabs.us/api/contact", zone_name = "civiclabs.us"}
+  { pattern = "*.civiclabs.us/api/contact", zone_name = "civiclabs.us" }
 ]
 
 # Email binding
 send_email = [
-  {type = "send_email", name = "SEB", destination_address = "${DESTINATION_EMAIL}"}
+  { type = "send_email", name = "SEB", destination_address = "${DESTINATION_EMAIL}" }
 ]
 
 # Vars
 vars = { FROM_EMAIL = "${FROM_EMAIL}" }
-

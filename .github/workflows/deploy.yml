@@ -1,4 +1,3 @@
-# .github/workflows/deploy.yml
 name: ☁️ Deployment
 
 on:
@@ -18,9 +17,12 @@ jobs:
 
       - name: Manage Secrets
         run: |
-          sed -i 's/${CLOUDFLARE_ACCOUNT_ID}/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/g' wrangler.toml
-          sed -i 's/${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' wrangler.toml
-          sed -i 's/${FROM_EMAIL}/${{ secrets.FROM_EMAIL }}/g' wrangler.toml
+          sed -i 's/\${CLOUDFLARE_ACCOUNT_ID}/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/g' wrangler.toml
+          sed -i 's/\${DESTINATION_EMAIL}/${{ secrets.DESTINATION_EMAIL }}/g' wrangler.toml
+          sed -i 's/\${FROM_EMAIL}/${{ secrets.FROM_EMAIL }}/g' wrangler.toml
+
+      - name: Debug Wrangler.toml
+        run: cat wrangler.toml # Add this line to check the wrangler.toml file
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
