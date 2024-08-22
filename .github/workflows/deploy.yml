@@ -24,6 +24,7 @@ jobs:
           sed -i "s/\${FROM_EMAIL}/${{ secrets.FROM_EMAIL }}/g" wrangler.toml
           sed -i "s/\${DESTINATION_CA_EMAIL}/${{ secrets.DESTINATION_CA_EMAIL }}/g" wrangler.toml
           sed -i "s/\${DESTINATION_HL_EMAIL}/${{ secrets.DESTINATION_HL_EMAIL }}/g" wrangler.toml
+          sed -i "s/\${CLOUDFLARE_TURNSTYLE_SECRET_KEY}/${{ secrets.CLOUDFLARE_TURNSTYLE_SECRET_KEY }}/g" wrangler.toml
 
       - name: Handle Slack Webhook
         run: |
