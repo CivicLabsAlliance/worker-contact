@@ -6,6 +6,20 @@ const allowedOrigins = [
     "https://civic-labs.ai",
 ];
 
+async function verifyTurnstileToken(secret, token) {
+    const verifyResponse = await fetch(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ secret, response: token })
+        }
+    );
+    const verifyResult = await verifyResponse.json();
+    console.log("Turnstile verification result:", verifyResult);
+    return verifyResult.success;
+}
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
@@ -51,21 +65,34 @@ export default {
 
             try {
                 console.log("Parsing request body as JSON");
-                const { name, email, company, message } = await request.json();
+                const { name, email, company, message, "cf-turnstile-response": turnstileResponse } = await request.json();
                 console.log(
                     `Received data: ${JSON.stringify({
                         name,
                         email,
                         company,
                         message,
+                        "cf-turnstile-response": turnstileResponse
                     })}`
                 );
 
-                if (!name || !email || !company || !message) {
+                if (!name || !email || !company || !message || !turnstileResponse) {
                     console.error("Missing required fields");
                     return new Response("Missing required fields", {
                         status: 400,
                     });
+                }
+
+                // Verify Turnstile token
+                console.log("Verifying Turnstile token");
+                const turnstileSuccess = await verifyTurnstileToken(
+                    env.CLOUDFLARE_TURNSTYLE_SECRET_KEY,
+                    turnstileResponse
+                );
+
+                if (!turnstileSuccess) {
+                    console.warn("Invalid Turnstile token");
+                    return new Response("Invalid Turnstile token", { status: 403 });
                 }
 
                 // Capture additional Cloudflare geographical information
